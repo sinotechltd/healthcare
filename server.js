@@ -5,11 +5,18 @@ const bcrypt = require("bcryptjs");
 const User = require("./models/user");
 const userController = require("./controllers/user.controller");
 
-const app = express();
-const port = 3000;
+var app = express();
+const port = 5000;
 
 // Middleware setup
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Custom middleware for logging req object
+app.use((req, res, next) => {
+  console.log(req);
+  next();
+});
 
 // Connect to MongoDB
 mongoose
@@ -24,17 +31,12 @@ mongoose
     console.error("Error connecting to MongoDB", error);
   });
 
-// User schema and model
-const userSchema = new mongoose.Schema({
-  username: String,
-  password: String,
-});
-
-const User = mongoose.model("User", userSchema);
-
 // Register route
 app.post("/register", userController.registerUser);
 app.post("/login", userController.loginUser);
+app.put("/healthdata", userController.updateHealthData);
+app.post("/exercise", userController.addExerciseEntry);
+app.post("/diet", userController.addDietEntry);
 
 // Start the server
 app.listen(port, () => {
