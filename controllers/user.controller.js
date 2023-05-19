@@ -3,7 +3,8 @@ const User = require("../models/user");
 const HealthData = require("../models/healthData");
 const Exercise = require("../models/exercise");
 const Diet = require("../models/diet");
-
+const mongoose = require("mongoose");
+const Goal = require("../models/Goals");
 // Register route
 exports.registerUser = async (req, res) => {
   //   console.log(req.body);
@@ -35,7 +36,7 @@ exports.registerUser = async (req, res) => {
 
     // Save the user to the database
     await newUser.save();
-
+    console.log(username);
     res.send("Registration successful!");
   } catch (error) {
     console.error("Error during registration", error);
@@ -61,51 +62,55 @@ exports.loginUser = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(400).send("Invalid username or password");
     }
+    const userData = {
+      userID: user.id,
+      fullName: "John Doe",
+      message: "Success",
+    };
 
-    res.send(`Login successful! Welcome, ${user.fullName}!`);
+    // Send the response with user ID and full name
+    // Send the response with user ID and full name
+    res.send(userData);
   } catch (error) {
     console.error("Error during login", error);
     res.status(500).send("Login failed");
   }
 };
 exports.updateHealthData = async (req, res) => {
-  const userId = req.user.id; // Assuming you have implemented user authentication and have access to the logged-in user's ID
-  const { height, weight, age, bloodPressure } = req.body;
+  //const userId = req.body.user; // Assuming the user ID is provided in the request body
+  const { user, height, weight, age, bloodPressure } = req.body;
 
   try {
-    // Find the health data for the user
-    let healthData = await HealthData.findOne({ user: userId });
+    // Create a new HealthData document
+    const healthData = new HealthData({
+      user,
+      height,
+      weight,
+      age,
+      bloodPressure,
+    });
 
-    if (!healthData) {
-      return res.status(404).send("Health data not found");
-    }
+    // Save the new health data
+    data = await healthData.save();
+    console.log(data);
 
-    // Update the health data fields
-    healthData.height = height;
-    healthData.weight = weight;
-    healthData.age = age;
-    healthData.bloodPressure = bloodPressure;
-
-    // Save the updated health data
-    await healthData.save();
-
-    res.send("Health data updated successfully!");
+    res.send("Health data created successfully!");
   } catch (error) {
-    console.error("Error updating health data", error);
-    res.status(500).send("Failed to update health data");
+    console.error("Error creating health data", error);
+    res.status(500).send("Failed to create health data");
   }
 };
+
 exports.addExerciseEntry = async (req, res) => {
-  const userId = req.user.id; // Assuming you have implemented user authentication and have access to the logged-in user's ID
-  const { exerciseType, duration, distance } = req.body;
+  //const userId = req.user.id; // Assuming you have implemented user authentication and have access to the logged-in user's ID
+  const { user, exerciseType, duration } = req.body;
 
   try {
     // Create a new exercise entry
     const newExercise = new Exercise({
-      user: userId,
+      user,
       exerciseType,
       duration,
-      distance,
     });
 
     // Save the exercise entry to the database
@@ -139,5 +144,127 @@ exports.addDietEntry = async (req, res) => {
   } catch (error) {
     console.error("Error adding diet entry", error);
     res.status(500).send("Failed to add diet entry");
+  }
+};
+exports.getUser = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const user = await User.findById(userId).exec();
+
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    res.send(user);
+  } catch (error) {
+    console.error("Error retrieving user", error);
+    res.status(500).send("Failed to retrieve user");
+  }
+};
+exports.getHealth = async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const healthData = await HealthData.findOne({ user: userId })
+      .populate("user")
+      .exec();
+
+    if (!healthData) {
+      return res.status(404).json({ error: "Health data not found" });
+    }
+    res.json(healthData);
+  } catch (error) {
+    console.error("Error fetching health data", error);
+    res.status(500).send("Failed to fetch health data");
+  }
+};
+exports.fetchExerciseEntries = async (req, res) => {
+  //const userId = req.user.id; // Assuming you have implemented user authentication and have access to the logged-in user's ID
+  const userId = req.query.id;
+
+  try {
+    // Fetch all exercise entries for the specified user
+    const exerciseEntries = await Exercise.find({ user: userId });
+
+    res.json(exerciseEntries);
+  } catch (error) {
+    console.error("Error fetching exercise entries", error);
+    res.status(500).send("Failed to fetch exercise entries");
+  }
+};
+
+//diet controllers
+
+exports.addDietEntry = async (req, res) => {
+  const { user, food, calorificCount, meal } = req.body;
+
+  try {
+    // Create a new diet entry
+    const newDietEntry = new Diet({
+      user,
+      food,
+      calorificCount,
+      meal,
+    });
+
+    // Save the diet entry to the database
+    await newDietEntry.save();
+
+    res.send("Diet entry added successfully!");
+  } catch (error) {
+    console.error("Error adding diet entry", error);
+    res.status(500).send("Failed to add diet entry");
+  }
+};
+
+exports.fetchDietEntries = async (req, res) => {
+  const userId = req.query.id;
+  console.log(userId);
+  try {
+    // Fetch diet entries for the logged-in user
+    // const userId = mongoose.Types.ObjectId(id);
+
+    // Find diet entries for the user
+    const dietEntries = await Diet.find({ user: userId });
+    // const dietEntries = await Diet.find({ user: id });
+    console.log(dietEntries);
+
+    res.json(dietEntries);
+  } catch (error) {
+    console.error("Error fetching diet entries", error);
+    res.status(500).send("Failed to fetch diet entries");
+  }
+};
+exports.fetchGoals = async (req, res) => {
+  const userId = req.query.id;
+  console.log(userId);
+  try {
+    const goals = await Goal.find();
+
+    res.json(goals);
+  } catch (error) {
+    console.error("Error fetching goals:", error);
+    res.status(500).json({ error: "Failed to fetch goals" });
+  }
+};
+exports.addGoal = async (req, res) => {
+  try {
+    const { user, target, date } = req.body;
+    console.log(user);
+
+    // Create a new goal
+    const newGoal = new Goal({
+      user,
+      target,
+      date,
+    });
+
+    // Save the goal to the database
+    await newGoal.save();
+
+    res.status(201).json({ message: "Goal created successfully" });
+  } catch (error) {
+    console.error("Error creating goal:", error);
+    res.status(500).json({ error: "Failed to create goal" });
   }
 };

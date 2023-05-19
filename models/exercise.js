@@ -14,10 +14,7 @@ const exerciseSchema = new mongoose.Schema({
   duration: {
     type: Number,
     required: true,
-  },
-  distance: {
-    type: Number,
-  },
+  }
 });
 
 const Exercise = mongoose.model("Exercise", exerciseSchema);

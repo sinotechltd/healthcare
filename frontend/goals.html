@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Goal Capture and Reporting</title>
+    <!-- Include necessary CSS libraries -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mt-4">Goal Capture and Reporting</h1>
+
+      <form id="goalForm" class="mt-4">
+        <div class="mb-3">
+          <label for="target" class="form-label">Target:</label>
+          <input type="text" class="form-control" id="target" required />
+        </div>
+        <div class="mb-3">
+          <label for="date" class="form-label">Date:</label>
+          <input type="date" class="form-control" id="date" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Create Goal</button>
+      </form>
+      <div id="goalList" class="mt-4"></div>
+    </div>
+
+    <!-- Include necessary JS libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

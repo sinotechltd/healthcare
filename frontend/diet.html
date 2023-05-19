@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Diet Page</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mt-5">Record Diet Entry</h1>
+
+      <form id="dietForm" class="mt-3">
+        <div class="form-group">
+          <label for="food">Food:</label>
+          <input
+            type="text"
+            id="food"
+            name="food"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="calorificCount">Calorific Count:</label>
+          <input
+            type="number"
+            id="calorificCount"
+            name="calorificCount"
+            class="form-control"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="meal">Meal:</label>
+          <select id="meal" name="meal" class="form-control" required>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dinner">Dinner</option>
+            <option value="Snack">Snack</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Record Diet Entry</button>
+      </form>
+
+      <h2 class="mt-5">Diet Entries</h2>
+      <ul id="dietList" class="list-group mt-3"></ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Get the form element
+        const form = document.querySelector("#dietForm");
+        var user = localStorage.getItem("userID");
+
+        // Add event listener for form submit
+        form.addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent the default form submission
+
+          // Get the form inputs
+          const foodInput = document.getElementById("food");
+          const calorificCountInput = document.getElementById("calorificCount");
+          const mealInput = document.getElementById("meal");
+         // var user = localStorage.getItem("userID");
+
+          // Create an object with the form data
+          const formData = {
+            user: user,
+            food: foodInput.value,
+            calorificCount: calorificCountInput.value,
+            meal: mealInput.value,
+          };
+
+          // Send the form data to the API endpoint
+          $.ajax({
+            url: "http://localhost:5000/diet",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            data: JSON.stringify(formData),
+            success: function (response) {
+              // Display success message
+              alert("Diet entry saved successfully");
+              // Refresh the page
+              location.reload();
+            },
+            error: function (error) {
+              console.error("Failed to save diet entry:", error);
+              // Handle the error case
+            },
+          });
+        });
+        // Function to fetch and display the user's recorded exercises
+        
+
+        function fetchDietEntries() {
+          $.ajax({
+            url: `http://localhost:5000/diet?id=${user}`,
+            method: "GET",
+            success: function (response) {
+              // Clear the diet list
+              $("#dietList").empty();
+
+              // Check if any diet entries exist
+              if (response.length === 0) {
+                $("#dietList").html("<p>No diet entries recorded</p>");
+              } else {
+                // Loop through the diet entries and display them
+                for (let i = 0; i < response.length; i++) {
+                  const dietEntry = response[i];
+                  const dietItem = `
+            <div class="card mb-2">
+              <div class="card-body">
+                <h5 class="card-title">${dietEntry.meal}</h5>
+                <p class="card-text">Food: ${dietEntry.food}</p>
+                <p class="card-text">Calorific Count: ${dietEntry.calorificCount}</p>
+              </div>
+            </div>
+          `;
+                  $("#dietList").append(dietItem);
+                }
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("Failed to fetch diet entries:", error);
+              // Handle the error case
+            },
+          });
+        }
+
+        // Call the fetchDietEntries function when the page loads
+        $(document).ready(function () {
+          fetchDietEntries();
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Landing Page</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+      <a class="navbar-brand" href="#">Health Tracker App</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h1>Welcome</h1>
+      <div class="card-view"></div>
+      <div class="form-view"></div>
+      <h5>
+        <br />
+        <br />
+        <br />
+        Record <a href="exercise.html">Exercise</a> or
+        <a href="diet.html">Exercise</a>
+      </h5>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Fetch user details when the landing page loads
+        var userID = localStorage.getItem("userID");
+        if (userID) {
+          $.ajax({
+            url: "http://localhost:5000/user/" + userID,
+            method: "GET",
+            success: function (response) {
+              console.log(response);
+              const fullName = response.fullName;
+
+              // Update the content of the <h1> tag with the full name
+              const heading = document.querySelector("h1");
+              heading.textContent = `Welcome, ${fullName}!`;
+            },
+            error: function (xhr, status, error) {
+              // Handle error case
+              console.log("Failed to fetch user details:", error);
+            },
+          });
+        }
+
+        fetchHealthData(userID); // Fetch health data when the page loads
+      });
+
+      async function fetchHealthData(userID) {
+        try {
+          // Make an API request to fetch the health data for the specified userID
+          const response = await fetch(
+            `http://localhost:5000/health?id=${userID}`
+          );
+          const data = await response.json();
+          console.log(data);
+
+          if (data.hasOwnProperty("error")) {
+            // Health data not found, display the form for recording data
+            const formView = document.querySelector(".form-view");
+            formView.innerHTML = `
+            <div class="card">
+                <div class="card-body">
+                 <br>
+                 <br>
+                 <p>You have not saved your health status, <a href="health.html">Record Health<a><p>
+                 <br>
+                 <br>
+                </div>
+              </div>
+            </div>           
+            `;
+          } else {
+            // Health data exists, display it in a card view
+            const cardView = document.querySelector(".card-view");
+            cardView.innerHTML = `
+              <div class="card">
+                <div class="card-body">
+                  <h2 class="card-title">Health Data</h2>
+                  <p class="card-text">Height: ${data.height} cm</p>
+                  <p class="card-text">Weight: ${data.weight} kg</p>
+                  <p class="card-text">Age: ${data.age}</p>
+                  <p class="card-text">Blood Pressure: ${data.bloodPressure}</p>
+                </div>
+              </div>
+            `;
+          }
+        } catch (error) {
+          console.error("Error fetching health data", error);
+        }
+      }
+    </script>
+  </body>
+</html>
