@@ -8,6 +8,36 @@
     />
   </head>
   <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+      <a class="navbar-brand" href="landing.html">Health Tracker App</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="diet.html">Diet</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="goals.html">Goals</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="health.html">Health</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="exercise.html">Exercise</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
     <div class="container">
       <h1 class="mt-5">Record Diet Entry</h1>
 
@@ -66,7 +96,7 @@
           const foodInput = document.getElementById("food");
           const calorificCountInput = document.getElementById("calorificCount");
           const mealInput = document.getElementById("meal");
-         // var user = localStorage.getItem("userID");
+          // var user = localStorage.getItem("userID");
 
           // Create an object with the form data
           const formData = {
@@ -97,7 +127,6 @@
           });
         });
         // Function to fetch and display the user's recorded exercises
-        
 
         function fetchDietEntries() {
           $.ajax({
@@ -115,14 +144,13 @@
                 for (let i = 0; i < response.length; i++) {
                   const dietEntry = response[i];
                   const dietItem = `
-            <div class="card mb-2">
-              <div class="card-body">
-                <h5 class="card-title">${dietEntry.meal}</h5>
-                <p class="card-text">Food: ${dietEntry.food}</p>
-                <p class="card-text">Calorific Count: ${dietEntry.calorificCount}</p>
-              </div>
-            </div>
-          `;
+                  <div class="card mb-2">
+                    <div class="card-body">
+                      <h5 class="card-title">${dietEntry.meal}</h5>
+                      <p class="card-text">Food: ${dietEntry.food}</p>
+                      <p class="card-text">Calorific Count: ${dietEntry.calorificCount}</p>
+                    </div>
+                  </div>`;
                   $("#dietList").append(dietItem);
                 }
               }
@@ -133,7 +161,6 @@
             },
           });
         }
-
         // Call the fetchDietEntries function when the page loads
         $(document).ready(function () {
           fetchDietEntries();

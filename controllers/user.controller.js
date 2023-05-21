@@ -79,6 +79,7 @@ exports.loginUser = async (req, res) => {
 exports.updateHealthData = async (req, res) => {
   //const userId = req.body.user; // Assuming the user ID is provided in the request body
   const { user, height, weight, age, bloodPressure } = req.body;
+  console.log(user);
 
   try {
     // Create a new HealthData document
@@ -150,11 +151,9 @@ exports.getUser = async (req, res) => {
   const userId = req.params.id;
   try {
     const user = await User.findById(userId).exec();
-
     if (!user) {
       return res.status(404).send("User not found");
     }
-
     res.send(user);
   } catch (error) {
     console.error("Error retrieving user", error);
@@ -162,17 +161,15 @@ exports.getUser = async (req, res) => {
   }
 };
 exports.getHealth = async (req, res) => {
-  const userId = req.params.id;
-
+  const userId = req.query.id;
+  // console.log(userId);
   try {
-    const healthData = await HealthData.findOne({ user: userId })
-      .populate("user")
-      .exec();
-
-    if (!healthData) {
-      return res.status(404).json({ error: "Health data not found" });
-    }
-    res.json(healthData);
+    // const goal = await Goal.find({ user: userId });
+    // // console.log(goal)
+    // res.json(goal);
+    const health = await HealthData.find({ user: userId });
+    console.log(health);
+    res.json(health);
   } catch (error) {
     console.error("Error fetching health data", error);
     res.status(500).send("Failed to fetch health data");
@@ -181,7 +178,6 @@ exports.getHealth = async (req, res) => {
 exports.fetchExerciseEntries = async (req, res) => {
   //const userId = req.user.id; // Assuming you have implemented user authentication and have access to the logged-in user's ID
   const userId = req.query.id;
-
   try {
     // Fetch all exercise entries for the specified user
     const exerciseEntries = await Exercise.find({ user: userId });
@@ -221,10 +217,6 @@ exports.fetchDietEntries = async (req, res) => {
   const userId = req.query.id;
   console.log(userId);
   try {
-    // Fetch diet entries for the logged-in user
-    // const userId = mongoose.Types.ObjectId(id);
-
-    // Find diet entries for the user
     const dietEntries = await Diet.find({ user: userId });
     // const dietEntries = await Diet.find({ user: id });
     console.log(dietEntries);
@@ -237,10 +229,42 @@ exports.fetchDietEntries = async (req, res) => {
 };
 exports.fetchGoals = async (req, res) => {
   const userId = req.query.id;
+  // console.log(userId);
+  try {
+    const goal = await Goal.find({ user: userId });
+    // console.log(goal)
+    res.json(goal);
+  } catch (error) {
+    console.error("Error fetching goals:", error);
+    res.status(500).json({ error: "Failed to fetch goals" });
+  }
+};
+exports.addGoal = async (req, res) => {
+  try {
+    const { user, target, date } = req.body;
+    console.log(user);
+
+    // Create a new goal
+    const newGoal = new Goal({
+      user,
+      target,
+      date,
+    });
+
+    // Save the goal to the database
+    await newGoal.save();
+
+    res.status(201).json({ message: "Goal created successfully" });
+  } catch (error) {
+    console.error("Error creating goal:", error);
+    res.status(500).json({ error: "Failed to create goal" });
+  }
+};
+exports.getUserGoals = async (req, res) => {
+  const userId = req.query.id;
   console.log(userId);
   try {
     const goals = await Goal.find();
-
     res.json(goals);
   } catch (error) {
     console.error("Error fetching goals:", error);
@@ -263,6 +287,35 @@ exports.addGoal = async (req, res) => {
     await newGoal.save();
 
     res.status(201).json({ message: "Goal created successfully" });
+  } catch (error) {
+    console.error("Error creating goal:", error);
+    res.status(500).json({ error: "Failed to create goal" });
+  }
+};
+
+exports.updateweight = async (req, res) => {
+  try {
+    console.log("you are here mf");
+    newWeight = req.body.weight;
+    const userId = req.params.userId;
+    HealthData.findOneAndUpdate(
+      { userId: userId },
+      { weight: newWeight },
+      { new: true }
+    )
+      .then((updatedData) => {
+        // Handle the case where the user's weight was successfully updated
+        if (updatedData) {
+          res.status(200).send("Weight updated successfully");
+        } else {
+          res.status(404).send("User not found");
+        }
+      })
+      .catch((error) => {
+        // Handle any errors that occurred during the update process
+        console.error("Failed to update weight:", error);
+        res.status(500).send("Failed to update weight");
+      });
   } catch (error) {
     console.error("Error creating goal:", error);
     res.status(500).json({ error: "Failed to create goal" });

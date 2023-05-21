@@ -9,7 +9,34 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-      <a class="navbar-brand" href="#">Health Tracker App</a>
+      <a class="navbar-brand" href="landing.html">Health Tracker App</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="diet.html">Diet</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="goals.html">Goals</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="health.html">Health</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="exercise.html">Exercise</a>
+          </li>
+        </ul>
+      </div>
     </nav>
 
     <div class="container mt-4">
@@ -62,9 +89,8 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
+      $(document).ready(function () {
         const form = document.querySelector("#healthForm");
-
         form.addEventListener("submit", function (event) {
           event.preventDefault();
 
@@ -73,7 +99,7 @@
           const ageInput = document.getElementById("age");
           const bloodPressureInput = document.getElementById("bloodPressure");
           var userID = localStorage.getItem("userID");
-          console.log();
+          console.log(userID);
 
           const formData = {
             user: userID,
@@ -83,24 +109,19 @@
             bloodPressure: bloodPressureInput.value,
           };
           console.log(formData);
-
-          fetch("http://localhost:5000/healthdata", {
+          $.ajax({
+            url: "http://localhost:5000/healthdata",
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
-          })
-            .then((response) => response.json())
-            .then((data) => {
+            contentType: "application/json",
+            data: JSON.stringify(formData),
+            success: function (response) {
               alert("Health data saved successfully");
-              //  <!-- location.reload(); -->
-            })
-            .catch((error) => {
+              window.location.href = "landing.html";
+            },
+            error: function (xhr, status, error) {
               console.error("Failed to save health data:", error);
-            });
-          alert("Health data saved successfully");
-          window.location.href = "landing.html";
+            },
+          });
         });
       });
     </script>

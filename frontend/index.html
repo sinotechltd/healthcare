@@ -69,12 +69,14 @@
       </form>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> -->
     <script>
-      $(document).ready(function() {
-        $("#loginForm").submit(function(e) {
+      $(document).ready(function () {
+        $("#loginForm").submit(function (e) {
           e.preventDefault();
 
           // Get form data
@@ -93,7 +95,7 @@
             method: "POST",
             data: JSON.stringify(data),
             contentType: "application/json",
-            success: function(response) {
+            success: function (response) {
               // Display success message using an alert
               console.log("User ID:", response.userID);
               localStorage.setItem("userID", response.userID);
@@ -101,7 +103,7 @@
               alert(response.message);
               window.location.href = "landing.html";
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
               // Display error message using an alert
               var errorMessage =
                 xhr.responseJSON && xhr.responseJSON.message

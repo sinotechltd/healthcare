@@ -11,6 +11,36 @@
     />
   </head>
   <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+      <a class="navbar-brand" href="landing.html">Health Tracker App</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="diet.html">Diet</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="goals.html">Goals</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="health.html">Health</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="exercise.html">Exercise</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
     <div class="container">
       <h1 class="mt-4">Goal Capture and Reporting</h1>
 
@@ -31,6 +61,87 @@
     <!-- Include necessary JS libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
-    <script src="app.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Get the goal list element
+        const goalList = $("#goalList");
+
+        // Function to fetch and display goals
+        function fetchGoals() {
+          const user = localStorage.getItem("userID");
+
+          $.ajax({
+            url: `http://localhost:5000/goals?id=${user}`,
+            method: "GET",
+            success: function (response) {
+              goalList.empty(); // Clear the goal list
+              if (response.length === 0) {
+                goalList.html("<p>No goals recorded.</p>");
+              } else {
+                // Loop through the goals and display them
+                for (let i = 0; i < response.length; i++) {
+                  const goal = response[i];
+                  const status =
+                    goal.achieved === 1 ? "Achieved" : "Not Achieved";
+                  const goalItem = `
+                    <div class="card mb-2">
+                      <div class="card-body">
+                        <h5 class="card-title">${goal.target}</h5>
+                        <p class="card-text">Date: ${goal.date}</p>
+                        <p class="card-text">Status: ${status}</p>
+                      </div>
+                    </div>
+                  `;
+                  goalList.append(goalItem);
+                }
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("Failed to fetch goals:", error);
+              goalList.html("<p>Failed to fetch goals.</p>");
+            },
+          });
+        }
+
+        // Call fetchGoals initially to load existing goals
+        fetchGoals();
+
+        // Get the goal form element
+        const goalForm = document.getElementById("goalForm");
+
+        // Add event listener for form submit
+        goalForm.addEventListener("submit", function (event) {
+          event.preventDefault(); // Prevent the default form submission
+
+          // Get the form inputs
+          const targetInput = document.getElementById("target");
+          const dateInput = document.getElementById("date");
+          const user = localStorage.getItem("userID");
+
+          // Create an object with the form data
+          const formData = {
+            user: user,
+            target: targetInput.value,
+            date: dateInput.value,
+          };
+
+          $.ajax({
+            url: "http://localhost:5000/goals",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(formData),
+            success: function (response) {
+              alert(response);
+              fetchGoals(); // Fetch and update the goal list
+              $("#goalForm")[0].reset(); // Reset the form
+            },
+            error: function (xhr, status, error) {
+              console.error("Failed to save goal:", error);
+              // Handle the error case
+            },
+          });
+        });
+      });
+    </script>
   </body>
 </html>

@@ -38,6 +38,7 @@ app.post("/register", userController.registerUser);
 app.post("/login", userController.loginUser);
 app.post("/healthdata", userController.updateHealthData);
 app.post("/exercises", userController.addExerciseEntry);
+app.put("/updateweight/:userId", userController.updateweight);
 
 app.get("/user/:id", userController.getUser);
 app.get("/health", userController.getHealth);
@@ -46,6 +47,7 @@ app.get("/exercises", userController.fetchExerciseEntries);
 //add diet
 app.get("/diet", userController.fetchDietEntries);
 app.get("/goals", userController.fetchGoals);
+// app.get("/goals", userController.fetchGoals);
 app.post("/diet", userController.addDietEntry);
 app.post("/goals", userController.addGoal);
 

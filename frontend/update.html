@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Update Weight</title>
+  <!-- Include necessary CSS libraries -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <a class="navbar-brand" href="landing.html">Health Tracker App</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="diet.html">Diet</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="goals.html">Goals</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="health.html">Health</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="exercise.html">Exercise</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="container">
+    <h1 class="mt-4">Update Weight</h1>
+
+    <form id="weightForm" class="mt-4">
+      <div class="mb-3">
+        <label for="weight" class="form-label">New Weight:</label>
+        <input type="number" class="form-control" id="weight" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Update Weight</button>
+    </form>
+  </div>
+
+  <!-- Include necessary JS libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Get the weight form element
+      const weightForm = document.getElementById("weightForm");
+
+      // Add event listener for form submit
+      weightForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Get the form input
+        const weightInput = document.getElementById("weight");
+        const user = localStorage.getItem("userID");
+
+        // Create an object with the form data
+        const formData = {
+          weight: parseFloat(weightInput.value)
+        };
+
+        axios.put(`http://localhost:5000/updateweight/${user}`, formData)
+          .then(function (response) {
+            alert(response.data);
+            weightForm.reset(); // Reset the form
+          })
+          .catch(function (error) {
+            console.error("Failed to update weight:", error);
+            // Handle the error case
+          });
+      });
+    });
+  </script>
+</body>
+</html>
